@@ -3,7 +3,7 @@ from qiskit import Aer, IBMQ  # import the Aer and IBMQ providers
 from qiskit.providers.aer import noise  # import Aer noise models
 
 # Choose a real device to simulate
-IBMQ.load_accounts()
+IBMQ.load_accounts() # this wont work, fix later by adding the API token on account
 device = IBMQ.get_backend('ibmq_16_melbourne')
 properties = device.properties()
 coupling_map = device.configuration().coupling_map
