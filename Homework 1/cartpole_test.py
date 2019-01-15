@@ -9,16 +9,17 @@ def main():
     dis = networks.Discriminator(sess)
     dis_copy = networks.Discriminator_copy
 
-    env = gym.make('CartPole-v0')
+    #env = gym.make('CartPole-v0')
+    env = gym.make('FrozenLake-v0')
     train.learn(env,
                 sess,
-                1000,
+                10, #1000
                 10000, 
                 0.99, 
                 dis,
                 dis_copy,
                 gen,
                 n_gen=5,
-                log_dir='./logs/')
+                log_dir='C:/CSCLOGS/')
 
 if __name__ == '__main__' : main()

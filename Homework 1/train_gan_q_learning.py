@@ -87,17 +87,17 @@ def learn(env,
     gen_min_op = optim.minimize(gen_loss, var_list=gen.trainable_variables)
 
     #buffer
-    buffer = utils.ReplayBuffer(buffer_size, 1)
+    buffer = utils.ReplayBuffer(buffer_size, 16)
 
     #writer (optional)
-    if log_dir is not None:
-        writer = tf.summary.FileWriter(log_dir)
-        dis_summ = tf.summary.scalar('discriminator loss', dis_loss)
-        gen_summ = tf.summary.scalar('generator loss', gen_loss)
-        rew_ph = tf.placeholder(tf.int32, shape=())
-        rew_summ = tf.summary.scalar('average reward', rew_ph)
-    else:
-        writer = None
+    #if log_dir is not None:
+    #    writer = tf.summary.FileWriter(log_dir)
+    #    dis_summ = tf.summary.scalar('discriminator loss', dis_loss)
+    #    gen_summ = tf.summary.scalar('generator loss', gen_loss)
+    #    rew_ph = tf.placeholder(tf.int32, shape=())
+    #    rew_summ = tf.summary.scalar('average reward', rew_ph)
+    #else:
+    #    writer = None
 
     #initialize all vars
     sess.run(tf.global_variables_initializer())
@@ -119,23 +119,26 @@ def learn(env,
         rew_agg = 0
         for _ in range(env._max_episode_steps):
             gen_seed = np.random.normal(0, 1, size=z_shape)
+            #gen_seed = np.eye[state, ]
             action_results = sess.run(gen.output, feed_dict={
-                gen.input_state : np.array([last_obs]),
+                #gen.input_state : np.array([last_obs]),
+                gen.input_state : np.eye(16)[last_obs: last_obs+1],
                 gen.input_seed : np.array([gen_seed])
             })[0]
             optimal_action = np.argmax(action_results)
 
             next_obs, reward, done, _ = env.step(optimal_action)
             rew_agg += reward
-            idx = buffer.store_frame(last_obs)
+            # idx = buffer.store_frame(last_obs)
+            idx = buffer.store_frame(np.eye(16)[last_obs: last_obs+1][0])
             buffer.store_effect(idx, optimal_action, reward, done)
 
             if done:
-                if writer is not None:
-                    rew_writer = sess.run(rew_summ, feed_dict={rew_ph : rew_agg})
-                    writer.add_summary(rew_writer, rew_tracker)
+                """#if writer is not None:
+                #    rew_writer = sess.run(rew_summ, feed_dict={rew_ph : rew_agg})
+                #    writer.add_summary(rew_writer, rew_tracker)
                     rew_tracker += 1
-                    rew_agg = 0
+                    rew_agg = 0"""
                 last_obs = env.reset()
             else:
                 last_obs = next_obs
@@ -145,9 +148,11 @@ def learn(env,
 
             #update discriminator n_dis times
             for _ in range(n_dis):
+                #print("BEFORE THE BUFFER.SAMPLE")
                 obs_batch, act_batch, rew_batch, next_obs_batch, done_batch = (
                     buffer.sample(batch_size)
                 )
+                #print("AFTER THE BUFFER.SAMPLE")
                 batch_z = np.random.normal(0, 1, size=[batch_size] + z_shape)
                 batch_y = []
                 for i in range(batch_size):
@@ -155,7 +160,9 @@ def learn(env,
                         batch_y.append(rew_batch[i])
                     else:
                         expected_ar = sess.run(gen.output, feed_dict={
+                            #edit this line
                             gen.input_state : np.array([obs_batch[i]]),
+                            #gen.input_state : np.eye(16)[last_obs: last_obs+1],
                             gen.input_seed: np.array([batch_z[i]])
                         })
                         future_reward = np.max(expected_ar)
@@ -166,7 +173,8 @@ def learn(env,
                 for i in range(batch_size):
                     predict_x.append(epsilons[i] * batch_y[i] + (1 - epsilons[i]) *
                                      np.max(sess.run(gen.output, feed_dict={
-                                         gen.input_state : np.array([obs_batch[i]]),
+                                         #gen.input_state : np.array([obs_batch[i]]),
+                                         gen.input_state : np.eye(16)[last_obs: last_obs+1],
                                          gen.input_seed : np.array([batch_z[i]])})))
                 predict_x = np.array(predict_x)
                 act_batch = np.expand_dims(act_batch, -1)
@@ -184,21 +192,21 @@ def learn(env,
                     grad_val_ph : predict_x
                 })
 
-                if writer is not None:
-                    dis_writer = sess.run(dis_summ, feed_dict={
-                        gen.input_seed : batch_z,
-                        gen.input_state : obs_batch,
-                        gen_dis.input_state : obs_batch,
-                        gen_dis.input_action : act_batch,
-                        dis.input_reward : batch_y,
-                        dis.input_state : obs_batch,
-                        dis.input_action : act_batch,
-                        grad_dis.input_state : obs_batch,
-                        grad_dis.input_action : act_batch,
-                        grad_val_ph : predict_x
-                    })
-                    writer.add_summary(dis_writer, dis_tracker)
-                    dis_tracker += 1
+               # if writer is not None:
+               #     dis_writer = sess.run(dis_summ, feed_dict={
+               #         gen.input_seed : batch_z,
+               #         gen.input_state : obs_batch,
+               #         gen_dis.input_state : obs_batch,
+               #         gen_dis.input_action : act_batch,
+               #         dis.input_reward : batch_y,
+               #         dis.input_state : obs_batch,
+               #         dis.input_action : act_batch,
+               #         grad_dis.input_state : obs_batch,
+               #         grad_dis.input_action : act_batch,
+               #         grad_val_ph : predict_x
+               #     })
+               #     writer.add_summary(dis_writer, dis_tracker)
+               #     dis_tracker += 1
 
             #update the generator n_gen times
             for _ in range(n_gen):
@@ -212,12 +220,12 @@ def learn(env,
                     gen_dis.input_action: act_batch
                 })
 
-                if writer is not None:
+                """if writer is not None:
                     gen_writer = sess.run(gen_summ, feed_dict={
                         gen.input_seed : batch_z,
                         gen.input_state : obs_batch,
                         gen_dis.input_state : obs_batch,
                         gen_dis.input_action: act_batch
                     })
-                    writer.add_summary(gen_writer, gen_tracker)
-                    gen_tracker += 1
+                    writer.add_summary(gen_writer, gen_tracker)"""
+                #    gen_tracker += 1
