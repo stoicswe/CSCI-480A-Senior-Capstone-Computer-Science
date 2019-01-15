@@ -114,10 +114,11 @@ def learn(env,
     print(gen.trainable_variables)
 
     #number of episodes to train
-    for _ in range(episodes):
+    for epi in range(episodes):
         #loop through all the steps
         rew_agg = 0
-        for _ in range(env._max_episode_steps):
+        reward_all = 0
+        for env_epi in range(env._max_episode_steps):
             gen_seed = np.random.normal(0, 1, size=z_shape)
             #gen_seed = np.eye[state, ]
             action_results = sess.run(gen.output, feed_dict={
@@ -129,6 +130,7 @@ def learn(env,
 
             next_obs, reward, done, _ = env.step(optimal_action)
             rew_agg += reward
+            reward_all += reward
             # idx = buffer.store_frame(last_obs)
             idx = buffer.store_frame(np.eye(16)[last_obs: last_obs+1][0])
             buffer.store_effect(idx, optimal_action, reward, done)
@@ -139,6 +141,7 @@ def learn(env,
                 #    writer.add_summary(rew_writer, rew_tracker)
                     rew_tracker += 1
                     rew_agg = 0"""
+                print("E: {0} ENV_E: {1} => {2}".format(epi, env_epi, reward_all))
                 last_obs = env.reset()
             else:
                 last_obs = next_obs
