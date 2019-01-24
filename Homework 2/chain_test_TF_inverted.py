@@ -5,8 +5,10 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from chain_links import Chain
 
-chain_env = Chain(10, 5, -1, -5)
-#env = gym.make('FrozenLake-v0')
+reward_distribution = np.zeros(10)
+reward_distribution[0] = -0.001
+reward_distribution[9] = -1
+chain_env = Chain(10, 5, reward_distribution)
 
 tf.reset_default_graph()
 #These lines establish the feed-forward part of the network used to choose actions

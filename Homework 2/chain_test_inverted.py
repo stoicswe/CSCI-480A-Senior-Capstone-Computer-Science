@@ -1,7 +1,10 @@
 import numpy as np
 from chain_links import Chain
 
-chain_env = Chain(10, 5, -1, -5)
+reward_distribution = np.zeros(10)
+reward_distribution[0] = -0.001
+reward_distribution[9] = -1
+chain_env = Chain(10, 5, reward_distribution)
 
 #Initialize table with all zeros
 Q = np.zeros([chain_env.get_observation_space(),chain_env.get_action_space()])
