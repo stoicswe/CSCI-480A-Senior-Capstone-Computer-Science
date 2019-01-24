@@ -2,14 +2,11 @@ import numpy as np
 import random as rand
 
 class Chain:
-    def __init__(self, n, start_state, reward_left, reward_right):
-        self.rewards = np.zeros(n)
+    def __init__(self, n, start_state, reward_distribution):
+        self.states = n
         self.start_pos = start_state
         self.current_pos = start_state
-        self.reward_left = reward_left
-        self.reward_right = reward_right
-        self.rewards[0] = reward_left
-        self.rewards[n-1] = reward_right
+        self.rewards = reward_distribution
     
     def reset(self):
         self.current_pos = self.start_pos

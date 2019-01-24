@@ -5,11 +5,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from chain_links import Chain
 
-reward_distribution = np.zeros(10)
-reward_distribution[0] = 0.001
-reward_distribution[9] = 1
-chain_env = Chain(10, 5, reward_distribution)
-chain_env = Chain(10, 5, reward_distribution)
+chain_env = Chain(10, 5, -1, -5)
 #env = gym.make('FrozenLake-v0')
 
 tf.reset_default_graph()
@@ -64,13 +60,6 @@ with tf.Session() as sess:
                 #Reduce chance of random action as we train the model.
                 e = 1./((i/50) + 10)
                 break
-            if i % 100 == 0:
-                print("{0}% Complete".format(i/num_episodes), end='\r')
         jList.append(j)
         rList.append(rAll)
 print("Percent of succesful episodes: " + str(sum(rList)/num_episodes) + "%")
-print("Average Steps: " + str(np.mean(jList)))
-plt.plot(rList)
-plt.show()
-plt.plot(jList)
-plt.show()

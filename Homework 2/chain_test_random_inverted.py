@@ -2,7 +2,7 @@ import numpy as np
 from chain_links import Chain
 
 n = 10
-chain_env = Chain(n, 5, 1, 5)
+chain_env = Chain(n, 5, -1, -5)
 total_steps = 2**(n-2)
 
 #Initialize table with all zeros
