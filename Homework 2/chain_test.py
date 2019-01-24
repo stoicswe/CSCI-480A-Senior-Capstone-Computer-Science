@@ -4,7 +4,7 @@ from chain_links import Chain
 chain_env = Chain(10, 5, 1, 5)
 
 #Initialize table with all zeros
-Q = np.zeros([chain_env.get_observation_space(),chain_env.get_observation_space()])
+Q = np.zeros([chain_env.get_observation_space(),chain_env.get_action_space()])
 # Set learning parameters
 lr = .8
 y = .95
@@ -22,9 +22,9 @@ for i in range(num_episodes):
     while j < 99:
         j+=1
         #Choose an action by greedily (with noise) picking from Q table
-        a = np.argmax(Q[s,:] + np.random.randn(1,chain_env.get_observation_space())*(1./(i+1)))
+        a = np.argmax(Q[s,:] + np.random.randn(1,chain_env.get_action_space())*(1./(i+1)))
         #Get new state and reward from environment
-        print(a)
+        #print("i",i, "a", a, "s", s)#, "s1", s1)
         s1,r,d = chain_env.step(a)
         #Update Q-Table with new knowledge
         Q[s,a] = Q[s,a] + lr*(r + y*np.max(Q[s1,:]) - Q[s,a])

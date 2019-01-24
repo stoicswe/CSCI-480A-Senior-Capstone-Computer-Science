@@ -12,6 +12,7 @@ class Chain:
     
     def reset(self):
         self.current_pos = self.start_pos
+        return self.current_pos
     
     def step(self, action):
         if (action == 0):
@@ -36,3 +37,6 @@ class Chain:
 
     def get_observation_space(self):
         return len(self.rewards)
+    
+    def get_action_space(self):
+        return 2
