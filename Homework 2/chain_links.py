@@ -1,4 +1,5 @@
 import numpy as np
+import random as rand
 
 class Chain:
     def __init__(self, n, start_state, reward_left, reward_right):
@@ -13,6 +14,12 @@ class Chain:
     def reset(self):
         self.current_pos = self.start_pos
         return self.current_pos
+    
+    def sampling(self):
+        if (rand.random() < 0.5):
+            return 0
+        else:
+            return 1
     
     def step(self, action):
         if (action == 0):
