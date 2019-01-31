@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
+import gym
 from collections import namedtuple
 
 
@@ -78,8 +79,12 @@ def generate_demonstrations(gw, policy, n_trajs=100, len_traj=20, rand_start=Fal
 
 
 def main():
+  env = gym.make('FrozenLake-v0')
+  H = 4
+  W = 4
   N_STATES = H * W
-  N_ACTIONS = 5
+  #N_ACTIONS = 5
+  N_ACTIONS = 4
 
   rmap_gt = np.zeros([H, W])
   rmap_gt[H-1, W-1] = R_MAX
