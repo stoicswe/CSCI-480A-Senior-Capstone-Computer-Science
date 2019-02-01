@@ -87,16 +87,17 @@ def main():
   N_ACTIONS = 4
 
   rmap_gt = np.zeros([H, W])
-  rmap_gt[H-1, W-1] = R_MAX
-  rmap_gt[0, W-1] = R_MAX
-  rmap_gt[H-1, 0] = R_MAX
+  rmap_gt[H-1, W-1] = 1 #R_MAX
+  #rmap_gt[0, W-1] = R_MAX
+  #rmap_gt[H-1, 0] = R_MAX
 
   gw = gridworld.GridWorld(rmap_gt, {}, 1 - ACT_RAND)
 
   rewards_gt = np.reshape(rmap_gt, H*W, order='F')
-  P_a = gw.get_transition_mat()
+  #P_a = gw.get_transition_mat()
+  P_a = env.env.P
 
-  values_gt, policy_gt = value_iteration.value_iteration(P_a, rewards_gt, GAMMA, error=0.01, deterministic=True)
+  values_gt, policy_gt = value_iteration.value_iteration(env, P_a, rewards_gt, GAMMA, error=0.01, deterministic=True)
   
   # use identity matrix as feature
   feat_map = np.eye(N_STATES)

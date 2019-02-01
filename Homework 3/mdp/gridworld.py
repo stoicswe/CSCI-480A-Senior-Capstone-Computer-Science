@@ -376,4 +376,4 @@ class GridWorld(object):
     returns:
       2d column-major position
     """
-    return (idx % self.height, idx / self.height)
+    return (idx % self.height, idx // self.height)

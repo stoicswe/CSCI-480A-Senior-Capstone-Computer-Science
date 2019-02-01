@@ -11,7 +11,7 @@ import math
 import numpy as np
 
 
-def value_iteration(P_a, rewards, gamma, error=0.01, deterministic=True):
+def value_iteration(env, P_a, rewards, gamma, error=0.01, deterministic=True):
   """
   static value iteration function. Perhaps the most useful function in this repo
   
@@ -29,7 +29,10 @@ def value_iteration(P_a, rewards, gamma, error=0.01, deterministic=True):
     values    Nx1 matrix - estimated values
     policy    Nx1 (NxN_ACTIONS if non-det) matrix - policy
   """
-  N_STATES, _, N_ACTIONS = np.shape(P_a)
+  #N_STATES, _, N_ACTIONS = np.shape(P_a)
+  #N_STATES, N_ACTIONS = np.shape(P_a)
+  N_STATES = env.env.nS
+  N_ACTIONS = env.env.nA
 
   values = np.zeros([N_STATES])
 
@@ -39,7 +42,8 @@ def value_iteration(P_a, rewards, gamma, error=0.01, deterministic=True):
 
     for s in range(N_STATES):
       v_s = []
-      values[s] = max([sum([P_a[s, s1, a]*(rewards[s] + gamma*values_tmp[s1]) for s1 in range(N_STATES)]) for a in range(N_ACTIONS)])
+      #values[s] = max([sum([P_a[s, s1, a]*(rewards[s] + gamma*values_tmp[s1]) for s1 in range(N_STATES)]) for a in range(N_ACTIONS)])
+      values[s] = max([sum([P_a[s][s1][a]*(rewards[s] + gamma*values_tmp[s1]) for s1 in range(N_STATES)]) for a in range(N_ACTIONS)])
 
     if max([abs(values[s] - values_tmp[s]) for s in range(N_STATES)]) < error:
       break
