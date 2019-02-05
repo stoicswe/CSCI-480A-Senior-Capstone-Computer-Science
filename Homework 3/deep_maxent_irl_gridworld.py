@@ -107,7 +107,7 @@ def main():
   print('Deep Max Ent IRL training ..')
   rewards = deep_maxent_irl(feat_map, P_a, GAMMA, trajs, LEARNING_RATE, N_ITERS)
 
-  values, _ = value_iteration.value_iteration(P_a, rewards, GAMMA, error=0.01, deterministic=True)
+  values, _ = value_iteration.value_iteration(env, P_a, rewards, GAMMA, error=0.01, deterministic=True)
   # plots
   plt.figure(figsize=(20,4))
   plt.subplot(1, 4, 1)

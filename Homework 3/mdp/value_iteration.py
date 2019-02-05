@@ -41,9 +41,22 @@ def value_iteration(env, P_a, rewards, gamma, error=0.01, deterministic=True):
     values_tmp = values.copy()
 
     for s in range(N_STATES):
-      v_s = []
       #values[s] = max([sum([P_a[s, s1, a]*(rewards[s] + gamma*values_tmp[s1]) for s1 in range(N_STATES)]) for a in range(N_ACTIONS)])
-      values[s] = max([sum([P_a[s][s1][a]*(rewards[s] + gamma*values_tmp[s1]) for s1 in range(N_STATES)]) for a in range(N_ACTIONS)])
+      #values[s] = max([sum([P_a[s][s1][a]*(float(rewards[s]) + float(gamma)*float(values_tmp[s1])) for s1 in range(N_STATES)]) for a in range(N_ACTIONS)])
+      vs = []
+      min_vs = []
+      for a in range(N_ACTIONS):
+        for s1 in range(N_STATES):
+          print(P_a[s][s1][a])
+          n1, n2, n3 = P_a[s][s1][a]
+          vsi = [n1,n2,n3]
+          m = rewards[s] + gamma*values_tmp[s1]
+          v = [vi*m for vi in vsi]
+          min_vs.append(v)
+        vs.append(sum(min_vs))
+        min_vs = []
+      values[s] = max(vs)
+      vs = []
 
     if max([abs(values[s] - values_tmp[s]) for s in range(N_STATES)]) < error:
       break
@@ -121,7 +134,7 @@ class ValueIterationAgent(object):
     """
     returns qvalue of (state, action)
     """
-    return sum([P_s1_s_a * (self.mdp.get_reward_sas(s, a, s1) + self.gamma * self.values[s1])
+    return sum([P_s1_s_a * (self.mdp.get_reward_sas(state, action, s1) + self.gamma * self.values[s1])
                 for s1, P_s1_s_a in self.mdp.get_transition_states_and_probs(state, action)])
 
   def eval_policy_dist(self, policy, iterations=100):
