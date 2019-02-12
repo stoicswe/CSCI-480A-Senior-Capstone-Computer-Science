@@ -22,7 +22,7 @@ PARSER.set_defaults(rand_start=True)
 PARSER.add_argument('-lr', '--learning_rate', default=0.02, type=float, help='learning rate')
 PARSER.add_argument('-ni', '--n_iters', default=20, type=int, help='number of iterations')
 ARGS = PARSER.parse_args()
-print(ARGS)
+print ARGS
 
 
 GAMMA = ARGS.gamma
@@ -74,11 +74,11 @@ def main():
 
 
 def test_irl_algorithms(gw, P_a, rmap_gt, policy_gt, trajs, feat_map):
-  print('LP IRL training ..')
+  print 'LP IRL training ..'
   rewards_lpirl = lp_irl(P_a, policy_gt, gamma=0.3, l1=10, R_max=R_MAX)
-  print('Max Ent IRL training ..')
+  print 'Max Ent IRL training ..'
   rewards_maxent = maxent_irl(feat_map, P_a, GAMMA, trajs, LEARNING_RATE*2, N_ITERS*2)
-  print('Deep Max Ent IRL training ..')
+  print 'Deep Max Ent IRL training ..'
   rewards = deep_maxent_irl(feat_map, P_a, GAMMA, trajs, LEARNING_RATE, N_ITERS)    
   values, _ = value_iteration.value_iteration(P_a, rewards, GAMMA, error=0.01, deterministic=True)
 

@@ -29,7 +29,7 @@ PARSER.set_defaults(rand_start=True)
 PARSER.add_argument('-lr', '--learning_rate', default=0.02, type=float, help='learning rate')
 PARSER.add_argument('-ni', '--n_iters', default=20, type=int, help='number of iterations')
 ARGS = PARSER.parse_args()
-print(ARGS)
+print((ARGS))
 
 
 GAMMA = ARGS.gamma
@@ -64,50 +64,57 @@ def generate_demonstrations(gw, policy, n_trajs=100, len_traj=20, rand_start=Fal
       start_pos = [np.random.randint(0, gw.height), np.random.randint(0, gw.width)]
 
     episode = []
-    gw.reset(start_pos)
+    gw.reset()
+    gw.s = 0
     cur_state = start_pos
-    cur_state, action, next_state, reward, is_done = gw.step(int(policy[gw.pos2idx(cur_state)]))
+    action = int(policy[gw.pos2idx(cur_state)])
+    cur_state = gw.idx2pos(gw.s)
+    next_state, reward, is_done, _ = gw.step(action)
+    next_state = gw.idx2pos(next_state)
     episode.append(Step(cur_state=gw.pos2idx(cur_state), action=action, next_state=gw.pos2idx(next_state), reward=reward, done=is_done))
     # while not is_done:
     for _ in range(len_traj):
-        cur_state, action, next_state, reward, is_done = gw.step(int(policy[gw.pos2idx(cur_state)]))
-        episode.append(Step(cur_state=gw.pos2idx(cur_state), action=action, next_state=gw.pos2idx(next_state), reward=reward, done=is_done))
-        if is_done:
-            break
+      action = int(policy[gw.pos2idx(cur_state)])
+      next_state, reward, is_done, _ = gw.step(action)
+      next_state = gw.idx2pos(next_state)
+      cur_state = gw.idx2pos(gw.s)
+      episode.append(Step(cur_state=gw.pos2idx(cur_state), action=action, next_state=gw.pos2idx(next_state), reward=reward, done=is_done))
+      if is_done:
+          break
     trajs.append(episode)
   return trajs
 
 
 def main():
-  env = gym.make('FrozenLake-v0')
+  import frozenlake_irl
+  gw = frozenlake_irl.FrozenLakeEnv()
   H = 4
   W = 4
   N_STATES = H * W
   #N_ACTIONS = 5
-  N_ACTIONS = 4
+  #N_ACTIONS = 4
 
   rmap_gt = np.zeros([H, W])
-  rmap_gt[H-1, W-1] = 1 #R_MAX
+  rmap_gt[H-1, W-1] = R_MAX
   #rmap_gt[0, W-1] = R_MAX
   #rmap_gt[H-1, 0] = R_MAX
 
-  gw = gridworld.GridWorld(rmap_gt, {}, 1 - ACT_RAND)
+  #gw = gridworld.GridWorld(rmap_gt, {}, 1 - ACT_RAND)
 
   rewards_gt = np.reshape(rmap_gt, H*W, order='F')
-  #P_a = gw.get_transition_mat()
-  P_a = env.env.P
+  P_a = gw.get_transition_mat()
 
-  values_gt, policy_gt = value_iteration.value_iteration(env, P_a, rewards_gt, GAMMA, error=0.01, deterministic=True)
+  values_gt, policy_gt = value_iteration.value_iteration(P_a, rewards_gt, GAMMA, error=0.01, deterministic=True)
   
   # use identity matrix as feature
   feat_map = np.eye(N_STATES)
 
   trajs = generate_demonstrations(gw, policy_gt, n_trajs=N_TRAJS, len_traj=L_TRAJ, rand_start=RAND_START)
   
-  print('Deep Max Ent IRL training ..')
+  print(('Deep Max Ent IRL training ..'))
   rewards = deep_maxent_irl(feat_map, P_a, GAMMA, trajs, LEARNING_RATE, N_ITERS)
 
-  values, _ = value_iteration.value_iteration(env, P_a, rewards, GAMMA, error=0.01, deterministic=True)
+  values, _ = value_iteration.value_iteration(P_a, rewards, GAMMA, error=0.01, deterministic=True)
   # plots
   plt.figure(figsize=(20,4))
   plt.subplot(1, 4, 1)
@@ -119,9 +126,6 @@ def main():
   plt.subplot(1, 4, 4)
   img_utils.heatmap2d(np.reshape(values, (H,W), order='F'), 'Value Map - Recovered', block=False)
   plt.show()
-
-
-
 
 if __name__ == "__main__":
   main()

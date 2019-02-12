@@ -7,7 +7,6 @@
 # MIT License
 
 import numpy as np
-import gym
 
 
 class GridWorld(object):
@@ -150,10 +149,8 @@ class GridWorld(object):
       for a in range(self.n_actions):
         inc = self.neighbors[a]
         nei_s = (state[0] + inc[0], state[1] + inc[1])
-        n0 = int(nei_s[0])
-        n1 = int(nei_s[1])
-        #if nei_s[0] < 0 or nei_s[0] >= self.height or nei_s[1] < 0 or nei_s[1] >= self.width or self.grid[nei_s[0]][nei_s[1]] == 'x':
-        if nei_s[0] < 0 or nei_s[0] >= self.height or nei_s[1] < 0 or nei_s[1] >= self.width or self.grid[n0][n1] == 'x':
+        if nei_s[0] < 0 or nei_s[0] >= self.height or \
+           nei_s[1] < 0 or nei_s[1] >= self.width or self.grid[nei_s[0]][nei_s[1]] == 'x':
           # if the move is invalid, accumulates the prob to the current state
           mov_probs[self.n_actions-1] += mov_probs[a]
           mov_probs[a] = 0
@@ -325,16 +322,7 @@ class GridWorld(object):
         for posj, prob in probs:
           sj = self.pos2idx(posj)
           # Prob of si to sj given action a
-          intSi = int(si)
-          intSj = int(sj)
-          intA = int(a)
-          if intSj > 24:
-            intSj = 24
-          if intSj > 15:
-            intSj = 15
-          print(intSi, intSj, intA)
-          #P_a[si, sj, a] = prob
-          P_a[intSi, intSj, intA] = prob
+          P_a[si, sj, a] = prob
     return P_a
 
   def get_values_mat(self, values):
@@ -376,4 +364,4 @@ class GridWorld(object):
     returns:
       2d column-major position
     """
-    return (idx % self.height, idx // self.height)
+    return (idx % self.height, idx / self.height)
