@@ -30,18 +30,20 @@ def layer(v):
     # Element-wise nonlinear transformation
     qml.Kerr(v[4], wires=0)
 
-    qml.Rotation(v[0], wires=1)
-    qml.Squeezing(v[1], 0., wires=1)
-    qml.Rotation(v[2], wires=1)
+    #================================================
+
+    qml.Rotation(v[5], wires=1)
+    qml.Squeezing(v[6], 0., wires=1)
+    qml.Rotation(v[7], wires=1)
 
     # Bias
-    qml.Displacement(v[3], 0., wires=1)
+    qml.Displacement(v[8], 0., wires=1)
 
     # Element-wise nonlinear transformation
-    qml.Kerr(v[4], wires=1)
+    qml.Kerr(v[9], wires=1)
 
-    qml.Beamsplitter(v[5],v[6], wires=[0,1])
-    qml.Beamsplitter(v[7],v[8], wires=[0,1])
+    qml.Beamsplitter(v[10],v[11], wires=[0,1])
+    qml.Beamsplitter(v[12],v[13], wires=[0,1])
 
 
 @qml.qnode(dev)
@@ -107,7 +109,7 @@ Y = [0,1,1,1]
 # initialize weights
 np.random.seed(0)
 num_layers = 4
-var_init = 0.05 * np.random.randn(num_layers, 9)
+var_init = 0.05 * np.random.randn(num_layers, 14)
 
 # create optimizer
 opt = AdamOptimizer(0.01, beta1=0.9, beta2=0.999)
