@@ -104,7 +104,7 @@ Y = data[:, 1]
 print(X)
 print(Y)"""
 X = [[0,0],[1,0],[0,1],[1,1]]
-Y = [0,1,1,1]
+Y = [0,1,1,0]
 
 # initialize weights
 np.random.seed(0)
@@ -116,11 +116,11 @@ opt = AdamOptimizer(0.01, beta1=0.9, beta2=0.999)
 
 # train
 var = var_init
-iterations = 30
+iterations = 200
 for it in range(iterations):
     var = opt.step(lambda v: cost(v, X, Y), var)
-    
-    print("Iter: {:5d} | Cost: {:0.7f} ".format(it + 1, cost(var, X, Y)))
+    if it % 10 == 0:
+        print("{:0.2f}% Iter: {:5d} | Cost: {:0.7f} ".format(((it+1)/iterations)*100, it + 1, cost(var, X, Y)))
 
 preds = [quantum_neural_net(var, x=x) for x in X]
 for i in range(len(preds)):
