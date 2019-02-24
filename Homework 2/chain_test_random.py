@@ -2,7 +2,10 @@ import numpy as np
 from chain_links import Chain
 
 n = 10
-chain_env = Chain(n, 5, 1, 5)
+reward_distribution = np.zeros(n)
+reward_distribution[0] = 0.1
+reward_distribution[n-1] = 1
+chain_env = Chain(n, 5, reward_distribution)
 total_steps = 2**(n-2)
 
 #Initialize table with all zeros
