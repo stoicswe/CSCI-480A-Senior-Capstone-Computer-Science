@@ -2,13 +2,15 @@ import tensorflow as tf
 import numpy as np
 import gym
 
-env = gym.make('CartPole-v0')
+#env = gym.make('CartPole-v0')
+env = gym.make('FrozenLake-v0')
 env = env.unwrapped
 # Policy gradient has high variance, seed for reproducability
 env.seed(1)
 
 ## ENVIRONMENT Hyperparameters
-state_size = 4
+#state_size = 4
+state_size = 16
 action_size = env.action_space.n
 
 ## TRAINING Hyperparameters
@@ -30,6 +32,7 @@ def discount_and_normalize_rewards(episode_rewards):
     return discounted_episode_rewards
 
 with tf.name_scope("inputs"):
+    #input_ = tf.placeholder(tf.float32, [None] + list(np.zeros(state_size).shape), name="input_")
     input_ = tf.placeholder(tf.float32, [None, state_size], name="input_")
     actions = tf.placeholder(tf.int32, [None, action_size], name="actions")
     discounted_episode_rewards_ = tf.placeholder(tf.float32, [None,], name="discounted_episode_rewards")
@@ -70,7 +73,7 @@ with tf.name_scope("inputs"):
         train_opt = tf.train.AdamOptimizer(learning_rate).minimize(loss)
 
 # Setup TensorBoard Writer
-writer = tf.summary.FileWriter("/tensorboard/pg/1")
+writer = tf.summary.FileWriter("./tensorboard/pg/1")
 
 ## Losses
 tf.summary.scalar("Loss", loss)
@@ -95,19 +98,24 @@ with tf.Session() as sess:
 
         # Launch the game
         state = env.reset()
+        state = np.eye(16)[state : state + 1]
         
         env.render()
            
         while True:
             
             # Choose action a, remember WE'RE NOT IN A DETERMINISTIC ENVIRONMENT, WE'RE OUTPUT PROBABILITIES.
-            action_probability_distribution = sess.run(action_distribution, feed_dict={input_: state.reshape([1,4])})
+            #action_probability_distribution = sess.run(action_distribution, feed_dict={input_: state.reshape([1,4])})
+            print(state)
+            #print(state.reshape([1,4]))
+            action_probability_distribution = sess.run(action_distribution, feed_dict={input_: state})
+            print(action_probability_distribution)
             
             action = np.random.choice(range(action_probability_distribution.shape[1]), p=action_probability_distribution.ravel())  # select action w.r.t the actions prob
 
             # Perform a
             new_state, reward, done, info = env.step(action)
-
+            new_state = np.eye(16)[new_state : new_state + 1]
             # Store s, a, r
             episode_states.append(state)
                         
