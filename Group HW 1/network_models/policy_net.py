@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 
 
 class Policy_net:
@@ -9,10 +10,12 @@ class Policy_net:
         """
 
         ob_space = env.observation_space
+        #ob_space = np.zeros(16)
         act_space = env.action_space
+        #act_space = np.zeros(4)
 
         with tf.variable_scope(name):
-            self.obs = tf.placeholder(dtype=tf.float32, shape=[None] + list(ob_space.shape), name='obs')
+            self.obs = tf.placeholder(dtype=tf.float32, shape=[None] + list(np.zeros(16).shape), name='obs')
 
             with tf.variable_scope('policy_net'):
                 layer_1 = tf.layers.dense(inputs=self.obs, units=20, activation=tf.tanh)
