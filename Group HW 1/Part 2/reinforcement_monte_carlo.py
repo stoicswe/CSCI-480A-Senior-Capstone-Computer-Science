@@ -1,9 +1,18 @@
 import tensorflow as tf
 import numpy as np
 import gym
+from gym.envs.registration import register
+register(
+    id='FrozenLakeNotSlippery-v0',
+    entry_point='gym.envs.toy_text:FrozenLakeEnv',
+    kwargs={'map_name' : '4x4', 'is_slippery': False},
+    max_episode_steps=100,
+    reward_threshold=0.8196, # optimum = .8196
+)
 
 #env = gym.make('CartPole-v0')
-env = gym.make('FrozenLake-v0')
+#env = gym.make('FrozenLake-v0')
+env = gym.make('FrozenLakeNotSlippery-v0')
 env = env.unwrapped
 # Policy gradient has high variance, seed for reproducability
 env.seed(1)
@@ -14,7 +23,7 @@ state_size = 16
 action_size = env.action_space.n
 
 ## TRAINING Hyperparameters
-max_episodes = 10000
+max_episodes = 20000
 learning_rate = 0.01
 gamma = 0.95 # Discount rate
 
@@ -27,7 +36,14 @@ def discount_and_normalize_rewards(episode_rewards):
     
     mean = np.mean(discounted_episode_rewards)
     std = np.std(discounted_episode_rewards)
-    discounted_episode_rewards = (discounted_episode_rewards - mean) / (std)
+    if (std == 0):
+        discounted_episode_rewards = (discounted_episode_rewards - mean)
+    else:
+        discounted_episode_rewards = (discounted_episode_rewards - mean) / (std)
+    
+    #discounted_episode_rewards = sum(discounted_episode_rewards)
+
+    #discounted_episode_rewards = (discounted_episode_rewards - mean)
     
     return discounted_episode_rewards
 
@@ -100,16 +116,16 @@ with tf.Session() as sess:
         state = env.reset()
         state = np.eye(16)[state : state + 1]
         
-        env.render()
+        #env.render()
            
         while True:
             
             # Choose action a, remember WE'RE NOT IN A DETERMINISTIC ENVIRONMENT, WE'RE OUTPUT PROBABILITIES.
             #action_probability_distribution = sess.run(action_distribution, feed_dict={input_: state.reshape([1,4])})
-            print(state)
+            #print(state)
             #print(state.reshape([1,4]))
             action_probability_distribution = sess.run(action_distribution, feed_dict={input_: state})
-            print(action_probability_distribution)
+            #print(action_probability_distribution)
             
             action = np.random.choice(range(action_probability_distribution.shape[1]), p=action_probability_distribution.ravel())  # select action w.r.t the actions prob
 
@@ -149,17 +165,18 @@ with tf.Session() as sess:
                 
                 # Calculate discounted reward
                 discounted_episode_rewards = discount_and_normalize_rewards(episode_rewards)
+                #discounted_episode_rewards = episode_rewards
                                 
                 # Feedforward, gradient and backpropagation
                 loss_, _ = sess.run([loss, train_opt], feed_dict={input_: np.vstack(np.array(episode_states)),
                                                                  actions: np.vstack(np.array(episode_actions)),
-                                                                 discounted_episode_rewards_: discounted_episode_rewards 
+                                                                 discounted_episode_rewards_: [episode_rewards_sum]
                                                                 })
                                                           
                 # Write TF Summaries
                 summary = sess.run(write_op, feed_dict={input_: np.vstack(np.array(episode_states)),
                                                                  actions: np.vstack(np.array(episode_actions)),
-                                                                 discounted_episode_rewards_: discounted_episode_rewards,
+                                                                 discounted_episode_rewards_: [episode_rewards_sum],
                                                                     mean_reward_: mean_reward
                                                                 })
                 
@@ -171,3 +188,4 @@ with tf.Session() as sess:
                 break
             
             state = new_state
+            #state = np.eye(16)[state : state + 1]
