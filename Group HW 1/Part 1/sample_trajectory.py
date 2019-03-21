@@ -28,15 +28,16 @@ def argparser():
 
 
 def main(args):
-    env = gym.make('CartPole-v0')
+    #env = gym.make('CartPole-v0')
+    env = gym.make('FrozenLake-v0')
     env.seed(0)
-    ob_space = env.observation_space
+    ob_space = np.zeros(16)
     Policy = Policy_net('policy', env)
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, args.model)
+        #saver.restore(sess, args.model)
         obs = env.reset()
 
         for iteration in range(args.iteration):  # episode
@@ -46,8 +47,8 @@ def main(args):
             while True:
                 run_steps += 1
                 # prepare to feed placeholder Policy.obs
-                obs = np.stack([obs]).astype(dtype=np.float32)
-
+                #obs = np.stack([obs]).astype(dtype=np.float32)
+                obs = np.eye(16)[obs:obs+1]
                 act, _ = Policy.act(obs=obs, stochastic=True)
                 act = np.asscalar(act)
 

@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 
 
 class Discriminator:
@@ -8,19 +9,21 @@ class Discriminator:
         Output of this Discriminator is reward for learning agent. Not the cost.
         Because discriminator predicts  P(expert|s,a) = 1 - P(agent|s,a).
         """
+        ob_space = env.observation_space
+        act_space = env.action_space
 
         with tf.variable_scope('discriminator'):
             self.scope = tf.get_variable_scope().name
-            self.expert_s = tf.placeholder(dtype=tf.float32, shape=[None] + list(env.observation_space.shape))
+            self.expert_s = tf.placeholder(dtype=tf.float32, shape=[None] + list(np.zeros(16).shape))
             self.expert_a = tf.placeholder(dtype=tf.int32, shape=[None])
-            expert_a_one_hot = tf.one_hot(self.expert_a, depth=env.action_space.n)
+            expert_a_one_hot = tf.one_hot(self.expert_a, depth=4)
             # add noise for stabilise training
             expert_a_one_hot += tf.random_normal(tf.shape(expert_a_one_hot), mean=0.2, stddev=0.1, dtype=tf.float32)/1.2
             expert_s_a = tf.concat([self.expert_s, expert_a_one_hot], axis=1)
 
-            self.agent_s = tf.placeholder(dtype=tf.float32, shape=[None] + list(env.observation_space.shape))
+            self.agent_s = tf.placeholder(dtype=tf.float32, shape=[None] + list(np.zeros(16).shape))
             self.agent_a = tf.placeholder(dtype=tf.int32, shape=[None])
-            agent_a_one_hot = tf.one_hot(self.agent_a, depth=env.action_space.n)
+            agent_a_one_hot = tf.one_hot(self.agent_a, depth=4)
             # add noise for stabilise training
             agent_a_one_hot += tf.random_normal(tf.shape(agent_a_one_hot), mean=0.2, stddev=0.1, dtype=tf.float32)/1.2
             agent_s_a = tf.concat([self.agent_s, agent_a_one_hot], axis=1)
