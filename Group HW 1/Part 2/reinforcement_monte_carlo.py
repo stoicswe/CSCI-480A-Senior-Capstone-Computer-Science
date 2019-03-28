@@ -11,8 +11,8 @@ register(
 )
 
 #env = gym.make('CartPole-v0')
-#env = gym.make('FrozenLake-v0')
-env = gym.make('FrozenLakeNotSlippery-v0')
+env = gym.make('FrozenLake-v0')
+#env = gym.make('FrozenLakeNotSlippery-v0')
 env = env.unwrapped
 # Policy gradient has high variance, seed for reproducability
 env.seed(1)
