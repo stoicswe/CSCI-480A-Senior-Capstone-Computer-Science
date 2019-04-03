@@ -4,6 +4,7 @@ import gym
 import numpy as np
 import tensorflow as tf
 from network_models.policy_net import Policy_net
+from network_models.policy_net_quantum import Policy_net_quantum
 from network_models.discriminator import Discriminator
 from algo.ppo import PPOTrain
 
@@ -21,8 +22,10 @@ def main(args):
     env = gym.make('CartPole-v0')
     env.seed(0)
     ob_space = env.observation_space
-    Policy = Policy_net('policy', env)
-    Old_Policy = Policy_net('old_policy', env)
+    #Policy = Policy_net('policy', env)
+    #Old_Policy = Policy_net('old_policy', env)
+    Policy = Policy_net_quantum('policy', env)
+    Old_Policy = Policy_net_quantum('old_policy', env)
     PPO = PPOTrain(Policy, Old_Policy, gamma=args.gamma)
     D = Discriminator(env)
 
@@ -67,6 +70,8 @@ def main(args):
                     break
                 else:
                     obs = next_obs
+            
+            print("Iteration: " + str(iteration))
 
             writer.add_summary(tf.Summary(value=[tf.Summary.Value(tag='episode_length', simple_value=run_policy_steps)])
                                , iteration)
