@@ -1,9 +1,9 @@
-from cvar.gridworld.cliffwalker import *
-from cvar.gridworld.core.constants import *
-from cvar.gridworld.core import cvar_computation
+from cliffwalker import *
+from core.constants import *
+from core import cvar_computation
 import numpy as np
-from cvar.gridworld.plots.grid import InteractivePlotMachine
-from cvar.common.util import timed, spaced_atoms
+from plots.grid import InteractivePlotMachine
+from utils import timed, spaced_atoms
 
 
 class ActionValueFunction:
