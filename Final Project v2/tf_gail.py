@@ -448,8 +448,8 @@ while frame_idx < max_frames and not early_stop:
         ac = ppo.get_action(ob)
         next_ob, _, done, _ = envs.step(ac)
         reward = discriminator.get_reward(np.concatenate([ob, ac], axis=1))
-        #f.write(str(reward))
-        print(reward)
+        f.write(str(reward))
+        #print(reward)
         
         value = ppo.get_value(ob)
         values.append(value)
@@ -465,7 +465,7 @@ while frame_idx < max_frames and not early_stop:
         if frame_idx % 1000 == 0:
             test_reward = np.mean([test_env(ppo) for _ in range(10)])
             test_rewards.append(test_reward)
-            #print(test_rewards)
+            print("i: {0}".format(frame_idx))
             #plot(frame_idx, test_rewards)
             if test_reward > threshold_reward: early_stop = True
             
