@@ -450,7 +450,7 @@ if __name__ == '__main__':
             ac = ppo.get_action(ob)
             next_ob, _, done, _ = envs.step(ac)
             reward = discriminator.get_reward(np.concatenate([ob, ac], axis=1))
-            f.write(str(reward))
+            f.write(str(reward[0])+'\n')
             #print(reward)
             
             value = ppo.get_value(ob)
