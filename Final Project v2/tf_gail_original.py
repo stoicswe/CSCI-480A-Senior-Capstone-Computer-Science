@@ -286,7 +286,7 @@ while frame_idx < max_frames and not early_stop:
         ac = ppo.get_action(ob)
         next_ob, _, done, _ = envs.step(ac)
         reward = discriminator.get_reward(np.concatenate([ob, ac], axis=1))
-        f.write(str(reward))
+        f.write(str(reward)+'\n')
         #print(reward)
         
         value = ppo.get_value(ob)
