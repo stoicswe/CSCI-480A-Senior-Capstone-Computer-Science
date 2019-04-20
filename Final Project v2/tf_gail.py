@@ -449,11 +449,11 @@ if __name__ == '__main__':
 
         for current_step in range(num_steps):
 
-            print("     Current Step: {0}".format(current_step))
+            #print("     Current Step: {0}".format(current_step))
             ac = ppo.get_action(ob)
             next_ob, _, done, _ = envs.step(ac)
             reward = discriminator.get_reward(np.concatenate([ob, ac], axis=1))
-            f.write(str(reward)+'\n')
+            #f.write(str(reward)+'\n')
             #print(reward)
             
             value = ppo.get_value(ob)
@@ -472,7 +472,8 @@ if __name__ == '__main__':
                 test_rewards.append(test_reward)
                 #plot(frame_idx, test_rewards)
                 if test_reward > threshold_reward: early_stop = True
-        
+
+        f.write(str(np.mean([r0[0] for r0 in rewards[-20:]]))+'\n')
         print("Frame Index: {0}".format(frame_idx))     
 
         next_value = ppo.get_value(next_ob)
