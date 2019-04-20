@@ -400,6 +400,7 @@ if __name__ == '__main__':
 
 
     # Hyperparameters
+    print("Initialize.")
 
     ppo_hidden_size           = 256
     discriminator_hidden_size = 128
@@ -412,8 +413,6 @@ if __name__ == '__main__':
     max_frames = 50000
     frame_idx  = 0
     test_rewards = []
-
-    f = open("qquantum_gail_rec.txt", "a")
 
     # Training
     ob_shape = list(envs.observation_space.shape)
@@ -434,6 +433,9 @@ if __name__ == '__main__':
     i_update = 0
     state = envs.reset()
     early_stop = False
+    
+    print("Open Output.")
+    f = open("qquantum_gail_rec.txt", "a")
 
     while frame_idx < max_frames and not early_stop:
         i_update += 1
@@ -445,8 +447,9 @@ if __name__ == '__main__':
         masks     = []
         entropy = 0
 
-        for _ in range(num_steps):
+        for current_step in range(num_steps):
 
+            print("     Current Step: {0}".format(current_step))
             ac = ppo.get_action(ob)
             next_ob, _, done, _ = envs.step(ac)
             reward = discriminator.get_reward(np.concatenate([ob, ac], axis=1))
@@ -467,10 +470,10 @@ if __name__ == '__main__':
             if frame_idx % 1000 == 0:
                 test_reward = np.mean([test_env(ppo) for _ in range(10)])
                 test_rewards.append(test_reward)
-                print("i: {0}".format(frame_idx))
                 #plot(frame_idx, test_rewards)
                 if test_reward > threshold_reward: early_stop = True
-                
+        
+        print("Frame Index: {0}".format(frame_idx))     
 
         next_value = ppo.get_value(next_ob)
         returns = compute_gae(next_value, rewards, masks, values)
@@ -492,5 +495,7 @@ if __name__ == '__main__':
         expert_ob_ac = expert_traj[np.random.randint(0, expert_traj.shape[0], 2 * num_steps * num_envs), :]
         policy_ob_ac = np.concatenate([obs, acs], 1)
         discriminator.update(np.concatenate([expert_ob_ac, policy_ob_ac], axis=0))
-
+    
+    print()
+    print("Done.")
     f.close()
