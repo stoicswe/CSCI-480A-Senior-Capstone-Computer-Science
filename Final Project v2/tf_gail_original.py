@@ -251,6 +251,7 @@ if __name__ == '__main__':
     frame_idx  = 0
     test_rewards = []
 
+    print("Open Output.")
     f = open("classic_gail_rec.txt", "a")
 
     #training
@@ -308,8 +309,10 @@ if __name__ == '__main__':
                 print("i: {0}".format(frame_idx))
                 #plot(frame_idx, test_rewards)
                 if test_reward > threshold_reward: early_stop = True
-                
 
+        f.write(str(np.mean([r0[0] for r0 in rewards[-20:]]))+'\n')
+        print("Frame Index: {0}".format(frame_idx))
+        
         next_value = ppo.get_value(next_ob)
         returns = compute_gae(next_value, rewards, masks, values)
 
