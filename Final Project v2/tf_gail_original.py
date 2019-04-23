@@ -259,7 +259,7 @@ if __name__ == '__main__':
     early_stop = False
 
     config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
+    config.gpu_options.allow_growth = False
     sess = tf.InteractiveSession(config=config)
     ppo = PPO(sess, ob_shape, ac_shape, lr, ppo_hidden_size)
     discriminator = Discriminator(sess, ob_shape, ac_shape, discriminator_hidden_size, lr, 'D')
