@@ -370,7 +370,7 @@ if __name__ == '__main__':
                 Vgate(self.Ev4)             | self.Eq[3]
             
             self.Estate = self.E_eng.run('tf', cutoff_dim=10, eval=False)
-            expert_out, _ = self.Estate.quad_expectation(0) 
+            expert_out, _ = self.Estate.quad_expectation(0)
 
 
             self.reward = - tf.squeeze(tf.log(tf.sigmoid(expert_out)))

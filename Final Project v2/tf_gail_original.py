@@ -335,3 +335,4 @@ if __name__ == '__main__':
         discriminator.update(np.concatenate([expert_ob_ac, policy_ob_ac], axis=0))
 
     f.close()
+    plot(frame_idx, rewards)
