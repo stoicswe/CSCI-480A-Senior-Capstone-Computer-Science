@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     from common.multiprocessing_env import SubprocVecEnv
 
-    num_envs = 16
+    num_envs = 1 #original is 16
     env_name = "Pendulum-v0"
 
     def make_env():
@@ -251,9 +251,6 @@ if __name__ == '__main__':
     frame_idx  = 0
     test_rewards = []
 
-    print("Open Output.")
-    f = open("classic_gail_rec.txt", "a")
-
     #training
     ob_shape = list(envs.observation_space.shape)
     ac_shape = list(envs.action_space.shape)
@@ -274,6 +271,9 @@ if __name__ == '__main__':
     state = envs.reset()
     early_stop = False
 
+    print("Open Output.")
+    f = open("classic_gail_rec.txt", "a")
+
     while frame_idx < max_frames and not early_stop:
         i_update += 1
         
@@ -284,18 +284,19 @@ if __name__ == '__main__':
         masks     = []
         entropy = 0
 
-        for _ in range(num_steps):
+        for current_step in range(num_steps):
 
+            #print("     Current Step: {0}".format(current_step))
             ac = ppo.get_action(ob)
             next_ob, _, done, _ = envs.step(ac)
-            reward = discriminator.get_reward(np.concatenate([ob, ac], axis=1))
-            f.write(str(reward)+'\n')
+            reward = [discriminator.get_reward(np.concatenate([ob, ac], axis=1))]
+            #f.write(str(reward)+'\n')
             #print(reward)
             
             value = ppo.get_value(ob)
             values.append(value)
-            rewards.append(reward[:, np.newaxis])
-            masks.append((1-done)[:, np.newaxis])
+            rewards.append(reward) #[:, np.newaxis])
+            masks.append((1-done)) #[:, np.newaxis])
 
             obs.append(ob)
             acs.append(ac)
@@ -306,10 +307,9 @@ if __name__ == '__main__':
             if frame_idx % 1000 == 0:
                 test_reward = np.mean([test_env(ppo) for _ in range(10)])
                 test_rewards.append(test_reward)
-                print("i: {0}".format(frame_idx))
                 #plot(frame_idx, test_rewards)
                 if test_reward > threshold_reward: early_stop = True
-
+        
         f.write(str(np.mean([r0[0] for r0 in rewards[-20:]]))+'\n')
         print("Frame Index: {0}".format(frame_idx))
         
