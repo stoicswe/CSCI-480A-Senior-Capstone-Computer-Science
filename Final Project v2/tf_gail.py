@@ -291,10 +291,10 @@ if __name__ == '__main__':
                 BSgate(self.Pbs6)           | (self.Pq[2], self.Pq[3])
                 BSgate()                    | (self.Pq[2], self.Pq[3])
 
-                Dgate(self.Pd1)             | self.Pq[0]
-                Dgate(self.Pd2)             | self.Pq[1]
-                Dgate(self.Pd3)             | self.Pq[2]
-                Dgate(self.Pd4)             | self.Pq[3]
+                #Dgate(self.Pd1)             | self.Pq[0]
+                #Dgate(self.Pd2)             | self.Pq[1]
+                #Dgate(self.Pd3)             | self.Pq[2]
+                #Dgate(self.Pd4)             | self.Pq[3]
 
                 Sgate(self.Ps1)             | self.Pq[0]
                 Sgate(self.Ps2)             | self.Pq[1]
@@ -355,10 +355,10 @@ if __name__ == '__main__':
                 BSgate(self.Ebs6)           | (self.Eq[2], self.Eq[3])
                 BSgate()                    | (self.Eq[2], self.Eq[3])
 
-                Dgate(self.Ed1)             | self.Eq[0]
-                Dgate(self.Ed2)             | self.Eq[1]
-                Dgate(self.Ed3)             | self.Eq[2]
-                Dgate(self.Ed4)             | self.Eq[3]
+                #Dgate(self.Ed1)             | self.Eq[0]
+                #Dgate(self.Ed2)             | self.Eq[1]
+                #Dgate(self.Ed3)             | self.Eq[2]
+                #Dgate(self.Ed4)             | self.Eq[3]
 
                 Sgate(self.Es1)             | self.Eq[0]
                 Sgate(self.Es2)             | self.Eq[1]
