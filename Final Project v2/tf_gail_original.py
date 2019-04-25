@@ -248,7 +248,7 @@ if __name__ == '__main__':
     ppo_epochs                = 4
     threshold_reward          = -200
 
-    max_frames = 50000
+    max_frames = 150000
     frame_idx  = 0
     test_rewards = []
 
