@@ -167,7 +167,8 @@ if __name__ == '__main__':
         plt.subplot(131)
         plt.title('frame %s. reward: %s' % (frame_idx, rewards[-1]))
         plt.plot(rewards)
-        plt.show()
+        plt.savefig("all_frames_plt.png")
+        #plt.show()
         
     def test_env(model, vis=False):
         ob = env.reset()
